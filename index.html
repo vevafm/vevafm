@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+* { box-sizing:border-box; margin:0; padding:0; font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif; }
+body { background:transparent; display:flex; justify-content:center; align-items:center; padding:5px; }
+
+.player-card {
+background:#fff; color:#1a1a1a; width:100%; max-width:340px;
+padding:18px; border-radius:16px;
+box-shadow:0 6px 18px rgba(0,0,0,.08);
+display:flex; flex-direction:column; align-items:center;
+position:relative; overflow:hidden; border:1px solid #e0e0e0;
+}
+
+.top-header { width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+.station-info { text-align:left; display:flex; flex-direction:column; }
+.station-name { font-size:22px; font-weight:900; color:#005c31; letter-spacing:.5px; line-height:1.1; }
+.station-slogan { font-size:12px; color:#005c31; font-weight:800; margin-top:2px; }
+
+.badge-aovivo {
+background:#ffebeb; color:#e51b24; font-size:10px; font-weight:800;
+padding:4px 10px; border-radius:20px; display:flex;
+align-items:center; gap:5px; border:1px solid #ffccd0;
+letter-spacing:.5px; flex-shrink:0;
+}
+
+.dot { width:7px; height:7px; background:#e51b24; border-radius:50%; animation:pulse 1.5s infinite; }
+
+@keyframes pulse {
+0% { transform:scale(.95); opacity:.8; }
+50% { transform:scale(1.35); opacity:1; }
+100% { transform:scale(.95); opacity:.8; }
+}
+
+.album-art-container {
+width:85px; height:85px; border-radius:12px; overflow:hidden;
+background:#f4f5f7; margin-bottom:12px;
+display:flex; justify-content:center; align-items:center;
+border:1px solid #e5e7eb; box-shadow:0 2px 6px rgba(0,0,0,.06);
+flex-shrink:0; position:relative;
+}
+
+.album-art { width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; display:none; }
+
+.album-placeholder {
+font-size:26px; color:#005c31; display:flex;
+align-items:center; justify-content:center; width:100%;
+height:100%; position:absolute; top:0; left:0;
+background:#f4f5f7; z-index:2;
+}
+
+.song-box {
+width:100%; background:#f8f9fa; padding:10px 12px;
+border-radius:10px; margin-bottom:14px;
+border:1px solid #e9ecef; text-align:center;
+}
+
+.song-label { font-size:11px; color:#005c31; font-weight:800; text-transform:uppercase; letter-spacing:1px; margin-bottom:5px; }
+
+.song-title { font-size:16px; font-weight:800; color:#111827; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+
+.controls-row { display:flex; align-items:center; justify-content:space-between; width:100%; gap:10px; }
+
+.btn-play {
+background:linear-gradient(135deg,#00875a,#006644);
+border:none; width:44px; height:44px; border-radius:50%;
+display:flex; align-items:center; justify-content:center;
+cursor:pointer; transition:all .2s ease;
+box-shadow:0 3px 10px rgba(0,135,90,.3); flex-shrink:0;
+}
+
+.btn-play:hover { transform:scale(1.05); background:linear-gradient(135deg,#009e6a,#007a52); }
+.btn-play svg { width:22px; height:22px; fill:#fff; }
+
+.volume-container {
+display:flex; align-items:center; gap:8px; flex-grow:1;
+background:#f4f5f7; padding:8px 12px;
+border-radius:30px; border:1px solid #e5e7eb;
+}
+
+.volume-icon { width:16px; height:16px; fill:#005c31; flex-shrink:0; }
+
+.volume-slider { -webkit-appearance:none; width:100%; height:4px; background:#dcdfe4; border-radius:2px; outline:none; }
+
+.volume-slider::-webkit-slider-thumb { -webkit-appearance:none; width:12px; height:12px; border-radius:50%; background:#005c31; cursor:pointer; }
+</style>
+</head>
+
+<body>
+
+<div class="player-card">
+
+<div class="top-header">
+<div class="station-info">
+<div class="station-name">Veva FM</div>
+<div class="station-slogan">A rádio do nosso coração</div>
+</div>
+<div class="badge-aovivo"><span class="dot"></span> AO VIVO</div>
+</div>
+
+<div class="album-art-container">
+<div class="album-placeholder" id="artPlaceholder">🎵</div>
+
+<img id="albumArt" class="album-art" alt="Capa da música">
+
+<img
+id="centovaArt"
+class="cc_streaminfo"
+data-type="trackimageurl"
+data-username="william"
+style="display:none"
+alt=""
+>
+</div>
+
+<div class="song-box">
+<div class="song-label">Tocando Agora</div>
+<div class="song-title" id="songTitle">Veva FM - No Ar</div>
+</div>
+
+<div class="controls-row">
+<button class="btn-play" id="playBtn" onclick="togglePlay()">
+<svg id="playIcon" viewBox="0 0 24 24">
+<path d="M8 5v14l11-7z"/>
+</svg>
+</button>
+
+<div class="volume-container">
+<svg class="volume-icon" viewBox="0 0 24 24">
+<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+</svg>
+<input type="range" class="volume-slider" id="volume" min="0" max="1" step="0.05" value="1" oninput="changeVolume(this.value)">
+</div>
+</div>
+</div>
+
+<audio id="radioAudio" preload="none">
+<source src="https://usa3.fastcast4u.com/proxy/william?mp=/stream" type="audio/mpeg">
+<source src="https://usa3.fastcast4u.com/proxy/william/;stream.mp3" type="audio/mpeg">
+<source src="https://usa3.fastcast4u.com/start/william" type="audio/mpeg">
+</audio>
+
+<script>
+(function(){
+  var centova = window.centovacast || (window.centovacast = {});
+  centova.streaminfo = centova.streaminfo || {};
+  centova.streaminfo.config = {
+    poll_limit: 1000,
+    poll_frequency: 2000
+  };
+})();
+</script>
+
+<script src="https://usa3.fastcast4u.com/system/streaminfo.js"></script>
+
+<script>
+const audio = document.getElementById('radioAudio');
+const playIcon = document.getElementById('playIcon');
+const songTitle = document.getElementById('songTitle');
+const albumArt = document.getElementById('albumArt');
+const centovaArt = document.getElementById('centovaArt');
+const artPlaceholder = document.getElementById('artPlaceholder');
+
+audio.volume = 1;
+
+let currentSong = "";
+let fallbackStarted = false;
+let centovaLoaded = false;
+let searchNumber = 0;
+let allowCentovaUpdate = false;
+let displayedCentovaUrl = "";
+let candidateCentovaUrl = "";
+
+function togglePlay() {
+  if (audio.paused) {
+    audio.play().then(() => {
+      playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+    }).catch(err => console.error(err));
+  } else {
+    audio.pause();
+    playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+  }
+}
+
+function changeVolume(val) {
+  audio.volume = val;
+}
+
+function showImage(url, requestId) {
+  const testImage = new Image();
+
+  testImage.onload = function() {
+    if (requestId !== searchNumber) return;
+
+    albumArt.src = url;
+    albumArt.style.display = 'block';
+    artPlaceholder.style.display = 'none';
+  };
+
+  testImage.onerror = function() {
+    if (requestId === searchNumber) showNote();
+  };
+
+  testImage.src = url;
+}
+
+function showNote() {
+  albumArt.style.display = 'none';
+  artPlaceholder.style.display = 'flex';
+}
+
+function searchOnline(song, requestId) {
+  const term = encodeURIComponent(song);
+
+  fetch('https://itunes.apple.com/search?term=' + term + '&entity=song&limit=5')
+    .then(response => response.json())
+    .then(data => {
+      if (requestId !== searchNumber || centovaLoaded) return;
+
+      if (data.results && data.results.length > 0) {
+        const result = data.results.find(item => item.artworkUrl100);
+
+        if (result) {
+          const imageUrl = result.artworkUrl100.replace('100x100bb', '300x300bb');
+          showImage(imageUrl, requestId);
+          return;
+        }
+      }
+
+      showNote();
+    })
+    .catch(() => {
+      if (requestId === searchNumber && !centovaLoaded) {
+        showNote();
+      }
+    });
+}
+
+function loadFallback(song, requestId) {
+  if (fallbackStarted || centovaLoaded) return;
+
+  fallbackStarted = true;
+  searchOnline(song, requestId);
+}
+
+function checkCentovaImage() {
+  if (!allowCentovaUpdate) return;
+
+  const url = centovaArt.getAttribute('src');
+
+  if (!url || url === 'undefined' || url === 'null') return;
+
+  // Aguarda uma URL diferente da capa anterior.
+  // Assim evita aceitar a capa antiga como se fosse a nova.
+  if (url === displayedCentovaUrl) return;
+
+  if (url === candidateCentovaUrl) return;
+
+  candidateCentovaUrl = url;
+
+  const requestId = searchNumber;
+  const testImage = new Image();
+
+  testImage.onload = function() {
+    if (requestId !== searchNumber || !allowCentovaUpdate) return;
+
+    centovaLoaded = true;
+    displayedCentovaUrl = url;
+    candidateCentovaUrl = "";
+
+    allowCentovaUpdate = false;
+
+    showImage(url, requestId);
+  };
+
+  testImage.onerror = function() {
+    if (requestId === searchNumber) {
+      candidateCentovaUrl = "";
+      centovaLoaded = false;
+    }
+  };
+
+  testImage.src = url;
+}
+
+centovaArt.addEventListener('load', checkCentovaImage);
+
+centovaArt.addEventListener('error', function() {
+  centovaLoaded = false;
+  candidateCentovaUrl = "";
+});
+
+function fetchSong() {
+  fetch('https://usa3.fastcast4u.com/rpc/william/streaminfo.get', {
+    cache: 'no-store'
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data && data.type === 'result' && data.data && data.data[0]) {
+        const track = data.data[0];
+
+        if (track.song && track.song !== currentSong) {
+          currentSong = track.song;
+
+          // Atualiza o nome assim que o servidor informa a nova faixa.
+          songTitle.innerText = currentSong;
+
+          searchNumber++;
+          const requestId = searchNumber;
+
+          fallbackStarted = false;
+          centovaLoaded = false;
+          candidateCentovaUrl = "";
+          allowCentovaUpdate = true;
+
+          // Evita deixar a capa da música anterior na tela.
+          showNote();
+
+          checkCentovaImage();
+
+          // Busca alternativa somente se a capa do Centova não chegar.
+          setTimeout(() => {
+            if (requestId !== searchNumber) return;
+
+            checkCentovaImage();
+
+            if (!centovaLoaded) {
+              loadFallback(currentSong, requestId);
+            }
+          }, 8000);
+        }
+      }
+    })
+    .catch(() => {});
+}
+
+// Consulta o nome da música a cada 2 segundos.
+setInterval(fetchSong, 2000);
+
+// Verifica a capa com mais frequência.
+setInterval(checkCentovaImage, 2000);
+
+fetchSong();
+</script>
+
+</body>
+</html>
