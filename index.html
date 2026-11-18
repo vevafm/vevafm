@@ -3,32 +3,46 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
 * { box-sizing:border-box; margin:0; padding:0; font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif; }
 body { background:transparent; display:flex; justify-content:center; align-items:center; padding:5px; }
 
 .player-card {
-background:#fff; color:#1a1a1a; width:100%; max-width:340px;
-padding:18px; border-radius:16px;
-box-shadow:0 6px 18px rgba(0,0,0,.08);
-display:flex; flex-direction:column; align-items:center;
-position:relative; overflow:hidden; border:1px solid #e0e0e0;
+background: #061c12; color: #fff; width: 100%; max-width: 390px;
+padding: 14px 16px; border-radius: 16px;
+box-shadow: 0 8px 24px rgba(0,0,0,.25);
+display: flex; flex-direction: column; gap: 12px;
+position: relative; overflow: hidden; border: 1px solid #0a2e1d;
 }
 
-.top-header { width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
-.station-info { text-align:left; display:flex; flex-direction:column; }
-.station-name { font-size:22px; font-weight:900; color:#005c31; letter-spacing:.5px; line-height:1.1; }
-.station-slogan { font-size:12px; color:#005c31; font-weight:800; margin-top:2px; }
+.top-header {
+display: flex; justify-content: space-between; align-items: center;
+width: 100%; gap: 8px;
+}
+
+.station-branding {
+display: flex; align-items: baseline; gap: 6px;
+min-width: 0; overflow: hidden;
+}
+
+.station-name {
+font-size: 16px; font-weight: 900; color: #a3e6c9;
+letter-spacing: .5px; text-transform: uppercase; flex-shrink: 0;
+}
+
+.station-slogan {
+font-size: 11px; font-weight: 500; color: #7ac9a6;
+white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
 
 .badge-aovivo {
-background:#ffebeb; color:#e51b24; font-size:10px; font-weight:800;
-padding:4px 10px; border-radius:20px; display:flex;
-align-items:center; gap:5px; border:1px solid #ffccd0;
-letter-spacing:.5px; flex-shrink:0;
+background: rgba(229, 27, 36, 0.15); color: #ff4d55; font-size: 9px; font-weight: 800;
+padding: 2px 8px; border-radius: 20px; display: flex;
+align-items: center; gap: 4px; border: 1px solid rgba(229, 27, 36, 0.3);
+letter-spacing: .5px; flex-shrink: 0;
 }
 
-.dot { width:7px; height:7px; background:#e51b24; border-radius:50%; animation:pulse 1.5s infinite; }
+.dot { width: 6px; height: 6px; background: #ff4d55; border-radius: 50%; animation: pulse 1.5s infinite; }
 
 @keyframes pulse {
 0% { transform:scale(.95); opacity:.8; }
@@ -36,106 +50,104 @@ letter-spacing:.5px; flex-shrink:0;
 100% { transform:scale(.95); opacity:.8; }
 }
 
+.main-row {
+display: flex; align-items: center; gap: 14px; width: 100%;
+}
+
 .album-art-container {
-width:85px; height:85px; border-radius:12px; overflow:hidden;
-background:#f4f5f7; margin-bottom:12px;
-display:flex; justify-content:center; align-items:center;
-border:1px solid #e5e7eb; box-shadow:0 2px 6px rgba(0,0,0,.06);
-flex-shrink:0; position:relative;
+width: 76px; height: 76px; border-radius: 10px; overflow: hidden;
+background: #0a2e1d; flex-shrink: 0; position: relative;
+display: flex; justify-content: center; align-items: center;
+border: 1px solid #144d31; box-shadow: 0 4px 10px rgba(0,0,0,.3);
 }
 
 .album-art { width:100%; height:100%; object-fit:cover; position:absolute; top:0; left:0; display:none; }
 
 .album-placeholder {
-font-size:26px; color:#005c31; display:flex;
-align-items:center; justify-content:center; width:100%;
-height:100%; position:absolute; top:0; left:0;
-background:#f4f5f7; z-index:2;
+font-size: 28px; color: #00875a; display: flex;
+align-items: center; justify-content: center; width: 100%;
+height: 100%; position: absolute; top: 0; left: 0;
+background: #0a2e1d; z-index: 2;
 }
 
-.song-box {
-width:100%; background:#f8f9fa; padding:10px 12px;
-border-radius:10px; margin-bottom:14px;
-border:1px solid #e9ecef; text-align:center;
+.player-content {
+display: flex; flex-direction: column; flex-grow: 1; min-width: 0;
 }
 
-.song-label { font-size:11px; color:#005c31; font-weight:800; text-transform:uppercase; letter-spacing:1px; margin-bottom:5px; }
+.now-playing-label {
+font-size: 9px; font-weight: 800; color: #52b788;
+letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px;
+}
 
-.song-title { font-size:16px; font-weight:800; color:#111827; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+.song-title {
+font-size: 14px; font-weight: 700; color: #ffffff;
+white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+max-width: 100%; margin-bottom: 10px;
+}
 
-.controls-row { display:flex; align-items:center; justify-content:space-between; width:100%; gap:10px; }
+.controls-row { display: flex; align-items: center; gap: 10px; width: 100%; }
 
 .btn-play {
-background:linear-gradient(135deg,#00875a,#006644);
-border:none; width:44px; height:44px; border-radius:50%;
-display:flex; align-items:center; justify-content:center;
-cursor:pointer; transition:all .2s ease;
-box-shadow:0 3px 10px rgba(0,135,90,.3); flex-shrink:0;
+background: linear-gradient(135deg,#00875a,#006644);
+border: none; width: 36px; height: 36px; border-radius: 50%;
+display: flex; align-items: center; justify-content: center;
+cursor: pointer; transition: all .2s ease;
+box-shadow: 0 3px 8px rgba(0,135,90,.4); flex-shrink: 0;
 }
 
-.btn-play:hover { transform:scale(1.05); background:linear-gradient(135deg,#009e6a,#007a52); }
-.btn-play svg { width:22px; height:22px; fill:#fff; }
+.btn-play:hover { transform: scale(1.05); background: linear-gradient(135deg,#009e6a,#007a52); }
+.btn-play svg { width: 18px; height: 18px; fill: #fff; }
 
 .volume-container {
-display:flex; align-items:center; gap:8px; flex-grow:1;
-background:#f4f5f7; padding:8px 12px;
-border-radius:30px; border:1px solid #e5e7eb;
+display: flex; align-items: center; gap: 6px; flex-grow: 1;
+background: #0a2e1d; padding: 6px 10px;
+border-radius: 20px; border: 1px solid #144d31;
 }
 
-.volume-icon { width:16px; height:16px; fill:#005c31; flex-shrink:0; }
+.volume-icon { width: 14px; height: 14px; fill: #a3e6c9; flex-shrink: 0; }
 
-.volume-slider { -webkit-appearance:none; width:100%; height:4px; background:#dcdfe4; border-radius:2px; outline:none; }
+.volume-slider { -webkit-appearance: none; width: 100%; height: 3px; background: #144d31; border-radius: 2px; outline: none; }
 
-.volume-slider::-webkit-slider-thumb { -webkit-appearance:none; width:12px; height:12px; border-radius:50%; background:#005c31; cursor:pointer; }
+.volume-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 10px; height: 10px; border-radius: 50%; background: #00875a; cursor: pointer; }
 </style>
 </head>
-
 <body>
-
 <div class="player-card">
+  <div class="top-header">
+    <div class="station-branding">
+      <span class="station-name">Veva FM</span>
+      <span class="station-slogan">A rádio do nosso coração</span>
+    </div>
+    <div class="badge-aovivo"><span class="dot"></span> AO VIVO</div>
+  </div>
 
-<div class="top-header">
-<div class="station-info">
-<div class="station-name">Veva FM</div>
-<div class="station-slogan">A rádio do nosso coração</div>
-</div>
-<div class="badge-aovivo"><span class="dot"></span> AO VIVO</div>
-</div>
+  <div class="main-row">
+    <div class="album-art-container">
+      <div class="album-placeholder" id="artPlaceholder">🎵</div>
+      <img id="albumArt" class="album-art" alt="Capa da música">
+      <img id="centovaArt" class="cc_streaminfo" data-type="trackimageurl" data-username="william" style="display:none" alt="">
+    </div>
 
-<div class="album-art-container">
-<div class="album-placeholder" id="artPlaceholder">🎵</div>
+    <div class="player-content">
+      <div class="now-playing-label">Tocando Agora</div>
+      <div class="song-title" id="songTitle">Veva FM - No Ar</div>
 
-<img id="albumArt" class="album-art" alt="Capa da música">
+      <div class="controls-row">
+        <button class="btn-play" id="playBtn" onclick="togglePlay()">
+          <svg id="playIcon" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+        </button>
 
-<img
-id="centovaArt"
-class="cc_streaminfo"
-data-type="trackimageurl"
-data-username="william"
-style="display:none"
-alt=""
->
-</div>
-
-<div class="song-box">
-<div class="song-label">Tocando Agora</div>
-<div class="song-title" id="songTitle">Veva FM - No Ar</div>
-</div>
-
-<div class="controls-row">
-<button class="btn-play" id="playBtn" onclick="togglePlay()">
-<svg id="playIcon" viewBox="0 0 24 24">
-<path d="M8 5v14l11-7z"/>
-</svg>
-</button>
-
-<div class="volume-container">
-<svg class="volume-icon" viewBox="0 0 24 24">
-<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
-</svg>
-<input type="range" class="volume-slider" id="volume" min="0" max="1" step="0.05" value="1" oninput="changeVolume(this.value)">
-</div>
-</div>
+        <div class="volume-container">
+          <svg class="volume-icon" viewBox="0 0 24 24">
+            <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>
+          </svg>
+          <input type="range" class="volume-slider" id="volume" min="0" max="1" step="0.05" value="1" oninput="changeVolume(this.value)">
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <audio id="radioAudio" preload="none">
@@ -154,7 +166,6 @@ alt=""
   };
 })();
 </script>
-
 <script src="https://usa3.fastcast4u.com/system/streaminfo.js"></script>
 
 <script>
@@ -254,10 +265,7 @@ function checkCentovaImage() {
 
   if (!url || url === 'undefined' || url === 'null') return;
 
-  // Aguarda uma URL diferente da capa anterior.
-  // Assim evita aceitar a capa antiga como se fosse a nova.
   if (url === displayedCentovaUrl) return;
-
   if (url === candidateCentovaUrl) return;
 
   candidateCentovaUrl = url;
@@ -271,7 +279,6 @@ function checkCentovaImage() {
     centovaLoaded = true;
     displayedCentovaUrl = url;
     candidateCentovaUrl = "";
-
     allowCentovaUpdate = false;
 
     showImage(url, requestId);
@@ -305,8 +312,6 @@ function fetchSong() {
 
         if (track.song && track.song !== currentSong) {
           currentSong = track.song;
-
-          // Atualiza o nome assim que o servidor informa a nova faixa.
           songTitle.innerText = currentSong;
 
           searchNumber++;
@@ -317,12 +322,9 @@ function fetchSong() {
           candidateCentovaUrl = "";
           allowCentovaUpdate = true;
 
-          // Evita deixar a capa da música anterior na tela.
           showNote();
-
           checkCentovaImage();
 
-          // Busca alternativa somente se a capa do Centova não chegar.
           setTimeout(() => {
             if (requestId !== searchNumber) return;
 
@@ -338,14 +340,10 @@ function fetchSong() {
     .catch(() => {});
 }
 
-// Consulta o nome da música a cada 2 segundos.
 setInterval(fetchSong, 2000);
-
-// Verifica a capa com mais frequência.
 setInterval(checkCentovaImage, 2000);
 
 fetchSong();
 </script>
-
 </body>
 </html>
